@@ -7,6 +7,6 @@ To best see the effect, turn on throtteling in your browser to simulate a slow c
 
 ## Demo
 
-<a href="https://wipfli.github.io/background-pattern">
+<a href="https://wipfli.github.io/background-grid">
 <img src="maplibre.png">
 </a>
