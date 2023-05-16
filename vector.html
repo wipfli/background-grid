@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Display a map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        var map = new maplibregl.Map({
+            container: 'map', // container id
+            style: 'https://demotiles.maplibre.org/style.json', // style URL
+            center: [0, 0], // starting position [lng, lat]
+            zoom: 1, // starting zoom
+            hash: 'map'
+        });
+
+        function _arrayBufferToBase64(buffer) {
+            var binary = '';
+            var bytes = new Uint8Array(buffer);
+            var len = bytes.byteLength;
+            for (var i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        maplibregl.addProtocol('custom', (params, callback) => {
+            
+            
+            fetch(`http://localhost:3000/0.pbf`)
+                .then(t => {
+                    console.log(params)
+                    if (t.status == 200) {
+                        t.arrayBuffer().then(arr => {
+                            console.log(_arrayBufferToBase64(arr));
+                            callback(null, arr, null, null);
+                        });
+                    } else {
+                        callback(new Error(`Tile fetch error: ${t.statusText}`));
+                    }
+                })
+                .catch(e => {
+                    callback(new Error(e));
+                });
+            return { cancel: () => { } };
+        });
+        map.on('load', function () {
+            map.addSource('custom', {
+                'type': 'vector',
+                'tiles': ['custom://{z}/{x}/{y}.pbf']
+            });
+            map.addLayer({
+                'id': 'lines',
+                'type': 'line',
+                'source': 'custom',
+                'source-layer': 'lines',
+                'paint': {
+                    'line-width': [
+                        'case',
+                        ['==', ['get', 'width'], 'wide'],
+                        2,
+                        1
+                    ],
+                    'line-color': 'white'
+                }
+            })
+        });
+    </script>
+
+</body>
+
+</html>

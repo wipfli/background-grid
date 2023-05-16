@@ -13,6 +13,10 @@
         "landcover": {
             "type": "vector",
             "url": "https://wipfli.github.io/swiss-map/tilejson-h3-landcover.json"
+        },
+        "background-grid": {
+            "type": "vector",
+            "tiles": ["background-grid://{z}/{x}/{y}.pbf"]
         }
     },
     "light": {
@@ -21,10 +25,25 @@
     "glyphs": "https://wipfli.github.io/swiss-map/font/{fontstack}/{range}.pbf",
     "layers": [
         {
-            "id": "pattern-layer",
+            "id": "background",
             "type": "background",
             "paint": {
-                "background-pattern": "pattern"
+                "background-color": "#f2efe9"
+            }
+        },
+        {
+            "id": "background-grid",
+            "type": "line",
+            "source": "background-grid",
+            "source-layer": "lines",
+            "paint": {
+                "line-width": [
+                    "case",
+                    ["==", ["get", "width"], "wide"],
+                    2,
+                    1
+                ],
+                "line-color": "white"
             }
         },
         {
