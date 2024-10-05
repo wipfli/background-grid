@@ -11,6 +11,10 @@ To best see the effect, turn on throtteling in your browser to simulate a slow c
 <img src="maplibre.png">
 </a>
 
+<a href="https://wipfli.github.io/background-grid/globe">
+<img src="globe.png">
+</a>
+
 ## How it works
 
 Generate a tile with lines
