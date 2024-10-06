@@ -36,26 +36,37 @@
     });
 
     let visibility = 'none';
-    let renderCounter = 0;
 
     map.on('load', () => {
-        map.on('render', () => {
-            renderCounter += 1;
-        })
 
-        map.on('dataloading', () => {
-            if (visibility === 'none' && renderCounter > 50) {
+        const show = () => {
+            if (visibility === 'none') {
                 visibility = 'visible';
                 map.setLayoutProperty('overlay-grid', 'visibility', visibility);
             }
-        })
+        }
 
-        map.on('idle', ()=>{
-            renderCounter = 0;
+        const hide = () => {
             if (visibility === 'visible') {
                 visibility = 'none';
                 map.setLayoutProperty('overlay-grid', 'visibility', visibility);
             }
+        }
+
+        map.on('movestart', () => {
+            show();
+        })
+
+        map.on('zoomstart', () => {
+            show();
+        })
+
+        map.on('zoomend', ()=>{
+            hide();
+        })
+
+        map.on('moveend', () => {
+            hide();
         })
     })
     
