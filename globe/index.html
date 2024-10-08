@@ -26,6 +26,11 @@
         return { data: tileArrayBuffer };
     });
 
+    maplibregl.setRTLTextPlugin(
+        'https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.2.3/mapbox-gl-rtl-text.min.js',
+        true // Lazy load the plugin
+    );
+
     const map = new maplibregl.Map({
         container: 'map', // container id
         style: 'style.json',
@@ -53,21 +58,21 @@
             }
         }
 
-        map.on('movestart', () => {
-            show();
-        })
+        // map.on('movestart', () => {
+        //     show();
+        // })
 
-        map.on('zoomstart', () => {
-            show();
-        })
+        // map.on('zoomstart', () => {
+        //     show();
+        // })
 
-        map.on('zoomend', ()=>{
-            hide();
-        })
+        // map.on('zoomend', ()=>{
+        //     hide();
+        // })
 
-        map.on('moveend', () => {
-            hide();
-        })
+        // map.on('moveend', () => {
+        //     hide();
+        // })
     })
     
 </script>
