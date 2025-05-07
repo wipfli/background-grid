@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <script src="https://wipfli.github.io/debug-assets/maplibre-hillshade/dist/maplibre-gl.js"></script>
+    <link href="https://wipfli.github.io/debug-assets/maplibre-hillshade/dist/maplibre-gl.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body,
+        #map {
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+
+
+    <script>
+
+        maplibregl.addProtocol('SparseTiles', async (params, abortController) => {
+
+            const [z, x, y] = params.url.replace('SparseTiles://', '').split('/');
+
+            var t
+
+            t = await fetch(`https://tiles.wifidb.net/data/Europe_JAXA_SonnyDTM_Italy_France_Switzerland_Merged_Sparse/${z}/${x}/${y}.webp`);
+
+            if (t.status !== 200) {
+                t = await fetch(`https://tiles.wifidb.net/data/jaxa_terrainrgb_webp/${z}/${x}/${y}.webp`);
+            }
+
+            if (t.status === 200) {
+                return { data: await t.arrayBuffer() };
+            } else {
+                throw new Error(`Tile fetch error: ${t.statusText}`);
+            }
+        });
+
+        const tileBase64 = 'GvwKeAIKBWxpbmVzKIAgGgV3aWR0aCIGCgR3aWRlIggKBm5hcnJvdxIRGAISAgAAIgkJgECAQAoA5T8SDxgCEgIAACIHCQAACoBAABIQGAISAgAAIggJAIBACgDlPxIQGAISAgABIggJAOQBCoBAABIRGAISAgABIgkJ5AGAQAoA5T8SEBgCEgIAASIICQDIAwqAQAASERgCEgIAASIJCcgDgEAKAOU/EhAYAhICAAEiCAkAqgUKgEAAEhAYAhICAAEiCAkAjgcKgEAAEhEYAhICAAEiCQmqBYBACgDlPxIRGAISAgABIgkJjgeAQAoA5T8SEBgCEgIAASIICQDyCAqAQAASEBgCEgIAASIICQDWCgqAQAASEBgCEgIAASIICQC4DAqAQAASEBgCEgIAASIICQCcDgqAQAASERgCEgIAASIJCfIIgEAKAOU/EhEYAhICAAEiCQnWCoBACgDlPxIRGAISAgABIgkJuAyAQAoA5T8SERgCEgIAASIJCZwOgEAKAOU/EhAYAhICAAAiCAkAgBAKgEAAEhAYAhICAAEiCAkA5BEKgEAAEhAYAhICAAEiCAkAyBMKgEAAEhAYAhICAAEiCAkAqhUKgEAAEhAYAhICAAEiCAkAjhcKgEAAEhAYAhICAAEiCAkA8hgKgEAAEhAYAhICAAEiCAkA1hoKgEAAEhAYAhICAAEiCAkAuBwKgEAAEhAYAhICAAEiCAkAnB4KgEAAEhEYAhICAAAiCQmAEIBACgDlPxIRGAISAgABIgkJ5BGAQAoA5T8SERgCEgIAASIJCcgTgEAKAOU/EhEYAhICAAEiCQmqFYBACgDlPxIRGAISAgABIgkJjheAQAoA5T8SERgCEgIAASIJCfIYgEAKAOU/EhEYAhICAAEiCQnWGoBACgDlPxIRGAISAgABIgkJuByAQAoA5T8SERgCEgIAASIJCZwegEAKAOU/EhAYAhICAAAiCAkAgCAKgEAAEhAYAhICAAEiCAkA5CEKgEAAEhAYAhICAAEiCAkAyCMKgEAAEhAYAhICAAEiCAkAqiUKgEAAEhAYAhICAAEiCAkAjicKgEAAEhAYAhICAAEiCAkA8igKgEAAEhAYAhICAAEiCAkA1ioKgEAAEhAYAhICAAEiCAkAuCwKgEAAEhAYAhICAAEiCAkAnC4KgEAAEhAYAhICAAAiCAkAgDAKgEAAEhAYAhICAAEiCAkA5DEKgEAAEhAYAhICAAEiCAkAyDMKgEAAEhAYAhICAAEiCAkAqjUKgEAAEhAYAhICAAEiCAkAjjcKgEAAEhAYAhICAAEiCAkA8jgKgEAAEhAYAhICAAEiCAkA1joKgEAAEhAYAhICAAEiCAkAuDwKgEAAEhAYAhICAAEiCAkAnD4KgEAAEhEYAhICAAAiCQmAIIBACgDlPxIRGAISAgABIgkJ5CGAQAoA5T8SERgCEgIAASIJCcgjgEAKAOU/EhEYAhICAAEiCQmqJYBACgDlPxIRGAISAgABIgkJjieAQAoA5T8SERgCEgIAASIJCfIogEAKAOU/EhEYAhICAAEiCQnWKoBACgDlPxIRGAISAgABIgkJuCyAQAoA5T8SERgCEgIAASIJCZwugEAKAOU/EhEYAhICAAAiCQmAMIBACgDlPxIRGAISAgABIgkJ5DGAQAoA5T8SERgCEgIAASIJCcgzgEAKAOU/EhEYAhICAAEiCQmqNYBACgDlPxIRGAISAgABIgkJjjeAQAoA5T8SERgCEgIAASIJCfI4gEAKAOU/EhEYAhICAAEiCQnWOoBACgDlPxIRGAISAgABIgkJuDyAQAoA5T8SERgCEgIAASIJCZw+gEAKAOU/EhAYAhICAAAiCAkAgEAKgEAA';
+
+        maplibregl.addProtocol('grid', async (params, abortController) => {
+            const tileArrayBuffer = Uint8Array.from(atob(tileBase64), c => c.charCodeAt(0));
+            return { data: tileArrayBuffer };
+        });
+
+        var map = window.map = new maplibregl.Map({
+            container: 'map',
+            zoom: 11.5,
+            center: [9.2128, 47.1385],
+            hash: true,
+            style: {
+                "version": 8,
+                "name": "Empty White Background",
+                "sources": {
+                    "grid": {
+                        "type": "vector",
+                        "tiles": [
+                            "grid://{z}/{x}/{y}"
+                        ]
+                    }
+                },
+                "layers": [
+                {
+                    "id": "background",
+                    "type": "background",
+                    "paint": {
+                        "background-color": "white"
+                    }
+                },
+                {
+                    "id": "background-grid",
+                    "type": "line",
+                    "source": "grid",
+                    "source-layer": "lines",
+                    "paint": {
+                        "line-width": [
+                            "case",
+                            ["==", ["get", "width"], "wide"],
+                            2,
+                            1
+                        ],
+                        "line-color": "white"
+                    }
+                },
+                ]
+            },
+            maxZoom: 18,
+            maxPitch: 85
+        });
+
+        map.addControl(new maplibregl.NavigationControl({
+            visualizePitch: true,
+            showZoom: true,
+            showCompass: true
+        }));
+
+        map.on('load', () => {
+
+            const layers = map.getStyle().layers;
+            // Find the index of the first symbol layer in the map style.
+            let firstSymbolId;
+            for (const layer of layers) {
+                if (layer.type === 'symbol') {
+                    firstSymbolId = layer.id;
+                    break;
+                }
+            }
+
+
+            map.addSource('terrainSource', {
+                'type': 'raster-dem',
+                'tiles': ['SparseTiles://{z}/{x}/{y}'],
+                'tileSize': 512,
+                'minzoom': 0,
+                'maxzoom': 16,
+                'attribution': '<a href=https://earth.jaxa.jp/en/data/policy/>AW3D30 (JAXA)</a> | <a href=https://sonny.4lima.de/>Sonny DTMs</a> | <a href=https://tinitaly.pi.ingv.it/>Tinitaly</a> | <a href=https://geoservices.ign.fr/rgealti>RGE Alti</a> | <a href=https://www.swisstopo.admin.ch/>Swisstopo</a> | <a href=https://geoservices.ign.fr/rgealti>RGE Alti</a> | <a href=https://www.mass.gov/info-details/massgis-data-lidar-terrain-data>MassGIS</a>'
+            });
+
+            map.setTerrain({source: 'terrainSource'});
+
+            map.addControl(
+                new maplibregl.TerrainControl({
+                    source: 'terrainSource',
+                })
+            );
+
+            map.addSource('hillshadeSource', {
+                'type': 'raster-dem',
+                'tiles': ['SparseTiles://{z}/{x}/{y}'],
+                'tileSize': 512,
+                'minzoom': 0,
+                'maxzoom': 16,
+                'attribution': '<a href=https://earth.jaxa.jp/en/data/policy/>AW3D30 (JAXA)</a> | <a href=https://sonny.4lima.de/>Sonny DTMs</a> | <a href=https://tinitaly.pi.ingv.it/>Tinitaly</a> | <a href=https://geoservices.ign.fr/rgealti>RGE Alti</a> | <a href=https://www.swisstopo.admin.ch/>Swisstopo</a> | <a href=https://geoservices.ign.fr/rgealti>RGE Alti</a> | <a href=https://www.mass.gov/info-details/massgis-data-lidar-terrain-data>MassGIS</a>'
+            });
+
+            map.addLayer(
+                {
+                    "id": "hillshade",
+                    "type": "hillshade",
+                    paint: {
+                        'hillshade-method': 'multidirectional',
+                        'hillshade-highlight-color': ['#FF4000', '#FFFF00', '#40ff00', '#00FF80'],
+                        'hillshade-shadow-color': ['#00bfff', '#0000ff', '#bf00ff', '#FF0080'],
+                        'hillshade-illumination-direction': [270, 315, 0, 45],
+                        'hillshade-illumination-altitude': [30, 30, 30, 30]
+                    },
+                    "source": "hillshadeSource"
+                },
+                "background-grid"
+            )
+        });
+
+
+    </script>
+</body>
+
+</html>
